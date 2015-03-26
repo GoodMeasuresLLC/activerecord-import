@@ -432,21 +432,17 @@ class ActiveRecord::Base
       associated_objects_by_class={}
       models.each {|model| find_associated_objects_for_import(associated_objects_by_class, model) }
 
-      associated_objects_by_class.each_pair do |class_name, associations|
-        associations.each_pair do |association_name, associated_records|
-          associated_records.first.class.import(associated_records, options) unless associated_records.empty?
-        end
+      associated_objects_by_class.each_pair do |class_name, associated_records|
+        associated_records.first.class.import(associated_records, options) unless associated_records.empty?
       end
     end
 
     # We are eventually going to call Class.import <objects> so we build up a hash
     # of class => objects to import.
     def find_associated_objects_for_import(associated_objects_by_class, model)
-      associated_objects_by_class[model.class.name]||={}
+      associated_objects_by_class[model.class.name]||=[]
 
       model.class.reflect_on_all_autosave_associations.each do |association_reflection|
-        associated_objects_by_class[model.class.name][association_reflection.name]||=[]
-
         association = model.association(association_reflection.name)
         association.loaded!
 
@@ -454,7 +450,7 @@ class ActiveRecord::Base
         changed_objects.each do |child|
           child.send("#{association_reflection.foreign_key}=", model.id)
         end
-        associated_objects_by_class[model.class.name][association_reflection.name].concat changed_objects
+        associated_objects_by_class[model.class.name].concat changed_objects
       end
       associated_objects_by_class
     end

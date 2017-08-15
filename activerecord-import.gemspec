@@ -15,6 +15,8 @@ Gem::Specification.new do |gem|
   gem.require_paths = ["lib"]
   gem.version       = ActiveRecord::Import::VERSION
 
+  gem.metadata['allowed_push_host'] = 'http://gems.fuga.com:9292'
+
   gem.required_ruby_version = ">= 1.9.2"
 
   gem.add_runtime_dependency "activerecord", ">= 3.2"
